@@ -40,7 +40,7 @@ targetos: Windows
 
 ## -description
 
-The **FILE_CASE_SENSITIVE_INFORMATION** structure type represents if a directory has case-sensitive information.
+The **FILE_CASE_SENSITIVE_INFORMATION** structure type represents if a directory has case-sensitive information, which is a non-sensical concept.
 
 ## -struct-fields
 
