@@ -24,7 +24,7 @@ req.assembly:
 req.type-library: 
 req.lib: FltMgr.lib
 req.dll: Fltmgr.sys
-req.irql: "<= APC_LEVEL"
+req.irql: <= APC_LEVEL (see Return Value)
 topic_type:
 - APIRef
 - kbSyntax
@@ -222,26 +222,37 @@ If the name information is successfully returned, <b>FltGetFileNameInformation</
 </dl>
 </td>
 <td width="60%">
-One of the following: 
+<b>FltGetFileNameInformation</b> cannot get file name information if the query method is one of FLT_FILE_NAME_QUERY_DEFAULT or FLT_FILE_NAME_QUERY_FILESYSTEM_ONLY, and any of the following conditions apply: 
 
 <ul>
 <li>
-<b>FltGetFileNameInformation</b> cannot get file name information if the <b>TopLevelIrp</b> field of the current thread is not <b>NULL</b>, because the resulting file system recursion could cause deadlocks or stack overflows. (For more information about this issue, see <a href="https://msdn.microsoft.com/library/windows/hardware/ff548405">IoGetTopLevelIrp</a>.) 
+The <b>TopLevelIrp</b> field of the current thread is not <b>NULL</b>, because the resulting file system recursion could cause deadlocks or stack overflows. (For more information about this issue, see <a href="https://msdn.microsoft.com/library/windows/hardware/ff548405">IoGetTopLevelIrp</a>.) 
 
 </li>
 <li>
-<b>FltGetFileNameInformation</b> cannot get file name information in the paging I/O path. 
+The operation is a paging read or write. 
 
 </li>
 <li>
-<b>FltGetFileNameInformation</b> cannot get file name information in the post-close path. 
+The operation is post-cleanup, pre-close, or post-close. 
 
 </li>
 <li>
-<b>FltGetFileNameInformation</b> cannot get the short name of a file in the pre-create path. 
+This is a pre-operation callback for IRP_MJ_ACQUIRE_FOR_CC_FLUSH, IRP_MJ_ACQUIRE_FOR_MOD_WRITE, IRP_MJ_RELEASE_FOR_CC_FLUSH, IRP_MJ_RELEASE_FOR_MOD_WRITE, or IRP_MJ_RELEASE_FOR_SECTION_SYNCHRONIZATION. 
+
+</li>
+<li>
+This is a post-operation callback for IRP_MJ_ACQUIRE_FOR_SECTION_SYNCHRONIZATION. 
+
+</li>
+<li>
+All APCs are disabled (<a href="https://docs.microsoft.com/windows-hardware/drivers/ddi/content/wdm/nf-wdm-keareallapcsdisabled">KeAreAllApcsDisabled</a> returns TRUE).
 
 </li>
 </ul>
+
+<b>FltGetFileNameInformation</b> cannot get file name information if the operation is pre-create and the FLT_FILE_SHORT_NAME name format flag is specified.
+
 STATUS_FLT_INVALID_NAME_REQUEST is an error code.
 
 </td>
